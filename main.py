@@ -24,7 +24,7 @@ def create_thread():
         headers = {
             'Authorization': f'Bearer {OPENAI_API_KEY}',
             'Content-Type': 'application/json',
-            'OpenAI-Beta': 'assistants=v1'
+            'OpenAI-Beta': 'assistants=v2'
         }
         
         response = requests.post(
@@ -54,7 +54,7 @@ def categorize():
         headers = {
             'Authorization': f'Bearer {OPENAI_API_KEY}',
             'Content-Type': 'application/json',
-            'OpenAI-Beta': 'assistants=v1'
+            'OpenAI-Beta': 'assistants=v2'
         }
         
         response = requests.post(
