@@ -42,32 +42,38 @@ def create_thread():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/categorize', methods=['POST'])
-def categorize():
+@app.route('/categorize/<thread_id>', methods=['POST'])
+def categorize(thread_id):
     try:
         data = request.get_json()
-        thread_id = data.get('thread_id')
-        
-        if not thread_id:
-            return jsonify({'error': 'thread_id is required'}), 400
-            
+        role = data.get('role')
+        content = data.get('content')
+
+        if not role or not content:
+            return jsonify({'error': 'role and content are required'}), 400
+
         headers = {
             'Authorization': f'Bearer {OPENAI_API_KEY}',
             'Content-Type': 'application/json',
             'OpenAI-Beta': 'assistants=v2'
         }
-        
+
+        payload = {
+            "role": role,
+            "content": content
+        }
+
         response = requests.post(
             f'{OPENAI_API_BASE}/threads/{thread_id}/messages',
             headers=headers,
-            json=data
+            json=payload
         )
-        
+
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:
-            return jsonify({'error': 'Failed to get assistant response'}), response.status_code
-            
+            return jsonify({'error': 'Failed to get assistant response', 'details': response.text}), response.status_code
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
