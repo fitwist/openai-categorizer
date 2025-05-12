@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # OpenAI API configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-OPENAI_API_BASE = 'https://api.openai.com/v2'
+OPENAI_API_BASE = 'https://api.openai.com/v1'
 
 
 @app.route('/', methods=['GET'])
@@ -29,13 +29,14 @@ def create_thread():
         
         response = requests.post(
             f'{OPENAI_API_BASE}/threads',
-            headers=headers
+            headers=headers,
+            json={}
         )
         
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:
-            return jsonify({'error': 'Failed to create thread'}), response.status_code
+            return jsonify({'error': 'Failed to create thread', 'details': response.text}), response.status_code
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500
