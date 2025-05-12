@@ -124,6 +124,39 @@ def get_category(thread_id, run_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/start_run/<thread_id>', methods=['POST'])
+def start_run(thread_id):
+    try:
+        data = request.get_json()
+        assistant_id = data.get('assistant_id')
+        if not assistant_id:
+            return jsonify({'error': 'assistant_id is required'}), 400
+
+        headers = {
+            'Authorization': f'Bearer {OPENAI_API_KEY}',
+            'Content-Type': 'application/json',
+            'OpenAI-Beta': 'assistants=v2'
+        }
+
+        payload = {
+            "assistant_id": assistant_id
+        }
+
+        response = requests.post(
+            f'{OPENAI_API_BASE}/threads/{thread_id}/runs',
+            headers=headers,
+            json=payload
+        )
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'Failed to start run', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port) 
