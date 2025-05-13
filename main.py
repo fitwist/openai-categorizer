@@ -157,6 +157,29 @@ def start_run(thread_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/get_status/<thread_id>/<run_id>', methods=['GET'])
+def get_status(thread_id, run_id):
+    try:
+        headers = {
+            'Authorization': f'Bearer {OPENAI_API_KEY}',
+            'Content-Type': 'application/json',
+            'OpenAI-Beta': 'assistants=v2'
+        }
+
+        response = requests.get(
+            f'{OPENAI_API_BASE}/threads/{thread_id}/runs/{run_id}',
+            headers=headers
+        )
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'Failed to get run status', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port) 
